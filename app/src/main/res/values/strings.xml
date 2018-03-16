@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">BMI</string>
+    <string name="mass">Mass</string>
+    <string name="height">Height</string>
+    <string name="countBtn">COUNT</string>
+    <string name="units">units</string>
+    <string name="wrongArgs">Input correct arguments.</string>
+    <string name="save">save</string>
+    <string name="author">author</string>
+    <string name="kilogram">[kg]</string>
+    <string name="centimeter">[cm]</string>
+    <string name="pound">[lb]</string>
+    <string name="inch">[in]</string>
+    <string name="si">SI</string>
+    <string name="usc">USC</string>
+
+</resources>
