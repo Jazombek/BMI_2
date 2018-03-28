@@ -33,5 +33,17 @@ public class ExampleUnitTest {
 
     }
 
+    @Test
+    public void COLOR_IS_BLUE(){
+        BMI temp = new BMI_SI(0,0);
+        assertEquals(1,temp.countColor(15),0);
+    }
+
+    @Test
+    public void COLOR_IS_GREEN(){
+        BMI temp = new BMI_SI(0,0);
+        assertEquals(2,temp.countColor(22),0);
+    }
+
 
 }

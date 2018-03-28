@@ -1,12 +1,7 @@
 package pl.edu.pwr.bmi2;
 
-//import BMI;
 
-/**
- * Created by bartek on 14.03.2018.
- */
-
-public class BMI_USC extends BMI {
+ class BMI_USC extends BMI {
 
 
 
@@ -16,19 +11,18 @@ public class BMI_USC extends BMI {
     }
 
     boolean correctData() {
-        if (height<=30 || mass <=60 || height > 90 || mass > 700){
-            return false;
-        }
-        else return true;
+        return (height > 30 || mass > 60 || height < 90 || mass < 700);
     }
+
 
     double countBMI() {
         if (!correctData()){
-            //throw IllegalArgumentException
-            return WRONG_ARGS;
+            throw new IllegalArgumentException();
+
         }else{
             double result = mass / (height * height);
-            return result*703;
+            bmi =  result*703;
+            return bmi;
         }
 
     }

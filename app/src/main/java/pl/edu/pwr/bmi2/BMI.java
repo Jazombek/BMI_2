@@ -1,15 +1,17 @@
 package pl.edu.pwr.bmi2;
 
-import java.math.BigDecimal;
 
-/**
- * Created by bartek on 08.03.2018.
- */
 
 public abstract class BMI {
+    private static final int FIRSTTIER = 19;
+    private static final int SECONDTIER = 25;
+    private static final int THIRDTIER = 30;
+    private static final int FOURTHTIER = 40;
     double mass;
     double height;
-    protected static int WRONG_ARGS = -1;
+    double bmi=0;
+
+
 
     public double getHeight() {
         return height;
@@ -27,7 +29,14 @@ public abstract class BMI {
         this.mass = mass;
     }
 
+    int countColor(double val){
 
+        if(val<SECONDTIER){
+            return val<FIRSTTIER?1:2;
+        }else if(val>THIRDTIER)
+            return val>FOURTHTIER?5:4;
+        else return 3;
+    }
 
     abstract boolean correctData();
 

@@ -15,20 +15,23 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
+import android.widget.Toast;
 
 
-import java.math.BigDecimal;
+
 
 
 public class MainActivity extends AppCompatActivity {
 
-    //private Button countBtn;
+    private Button countBtn;
     private EditText massEditText;
     private EditText heightEditText;
 
     private Boolean unitsSI = false;
     private Switch unitSwitch;
-    private static int WRONG_ARGS = -1;
+    private static final String MASS = "mass";
+    private static final String HEIGHT = "height";
+    private static final String UNITS = "Units";
 
     //private
 
@@ -40,52 +43,79 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.author:
                 startActivity(new Intent(this, AuthorScreen.class));
                 return true;
             case R.id.save:
                 SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString(getString(R.string.height), heightEditText.getText().toString());
-                editor.putString(getString(R.string.mass), massEditText.getText().toString());
-                editor.putBoolean(getString(R.string.units),unitsSI);
+                editor.putString(HEIGHT, heightEditText.getText().toString());
+                editor.putString(MASS, massEditText.getText().toString());
+                editor.putBoolean(UNITS, unitsSI);
                 editor.apply();
                 return true;
-            default:return false;
+            default:
+                return false;
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        Toolbar myToolbar =  findViewById(R.id.my_toolbar);
+    protected void makeToolbar() {
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        //actionBar.setDisplayShowCustomEnabled(true);
+        if (actionBar != null)
         actionBar.setDisplayShowTitleEnabled(false);
+    }
 
-
-        Button countBtn =  findViewById(R.id.countBtn);
+    protected void assignItems() {
+        countBtn = findViewById(R.id.countBtn);
         massEditText = findViewById(R.id.massEditText);
         heightEditText = findViewById(R.id.heightEditText);
 
         unitSwitch = findViewById(R.id.unitSwitch);
+    }
+
+    private BMI makeBMI() {
+
+        BMI count;
+        Long height = 0L;
+        Long mass = 0L;
+
+        try {
+            height = Long.parseLong(heightEditText.getText().toString());
+            mass = Long.parseLong(massEditText.getText().toString());
+
+        } finally {
+
+
+            if (unitsSI) {
+                count = new BMI_USC(mass, height);
+
+            } else {
+                count = new BMI_SI(mass, height);
+
+            }
+
+        }
+        return count;
+
+
+    }
 
 
 
+    protected void setListeners() {
         unitSwitch.setOnCheckedChangeListener(
                 new CompoundButton.OnCheckedChangeListener() {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        unitsSI=isChecked;
-                        if(unitsSI){
-                        massEditText.setHint(R.string.pound);
-                        heightEditText.setHint(R.string.inch);}
-                        else{
+                        unitsSI = isChecked;
+                        if (unitsSI) {
+                            massEditText.setHint(R.string.pound);
+                            heightEditText.setHint(R.string.inch);
+                        } else {
                             massEditText.setHint(R.string.kilogram);
                             heightEditText.setHint(R.string.centimeter);
                         }
@@ -95,55 +125,44 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         countBtn.setOnClickListener(
-                new View.OnClickListener()
-                {
-                    public void onClick(View view)
-                    {
-                        Intent resIntent = new Intent(getApplicationContext(), Main2Activity.class);
-                        double height=0;
-                        double mass=0;
-                        try {
-                            height = Long.parseLong("0" + heightEditText.getText().toString());
-                            mass = Long.parseLong("0" + massEditText.getText().toString());
-                        }catch (Exception e){
-                            resIntent.putExtra("error",getString(R.string.wrongArgs));
-                            startActivity(resIntent);
-                        }
-                        //BMI count;
+                new View.OnClickListener() {
+                    public void onClick(View view) {
+
+                        BMI count;
                         double res;
-                        if(unitsSI){BMI_USC count = new BMI_USC(mass, height);
+                        try {
+                            count = makeBMI();
                             res = count.countBMI();
-                             }
-                            else{
-                                BMI_SI count = new BMI_SI(mass, height);
-                            res = count.countBMI();
-                            }
 
-
-                        if(res==WRONG_ARGS){
-                            resIntent.putExtra("error",getString(R.string.wrongArgs));
-                        }else {
-                            //heightEditText.setText(res+"");
-
-                            BigDecimal res2 = new BigDecimal(String.valueOf(res)).setScale(2, BigDecimal.ROUND_FLOOR);
-
-
-                            resIntent.putExtra("result",res2);
+                            Main2Activity.start(getApplicationContext(), res, count.countColor(res));
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), R.string.wrongArgs,
+                                    Toast.LENGTH_SHORT).show();
                         }
-                            startActivity(resIntent);
-
                     }
-               });
+                });
     }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        makeToolbar();
+        assignItems();
+        setListeners();
+
+    }
+
 
     @Override
     public void onResume() {
         super.onResume();
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        unitsSI=sharedPref.getBoolean(getString(R.string.units),false);
+        unitsSI = sharedPref.getBoolean(UNITS, false);
         unitSwitch.setChecked(unitsSI);
-        massEditText.setText(sharedPref.getString(getString(R.string.mass), ""));
-        heightEditText.setText(sharedPref.getString(getString(R.string.height), ""));
+        massEditText.setText(sharedPref.getString(MASS, ""));
+        heightEditText.setText(sharedPref.getString(HEIGHT, ""));
 
 
     }

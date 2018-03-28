@@ -1,40 +1,33 @@
 package pl.edu.pwr.bmi2;
 
-import android.widget.TextView;
-
-/**
- * Created by bartek on 05.03.2018.
- */
 
 
-
-public class BMI_SI extends BMI {
+class BMI_SI extends BMI {
     private double mass;
     private double height;
 
-    public BMI_SI (double mass, double height){
-        this.mass=mass;
-        this.height=height;
+    BMI_SI(double mass, double height) {
+        this.mass = mass;
+        this.height = height;
     }
+
     boolean correctData() {
 
-        if (height<=100 || mass <=30 || height > 220 || mass > 350){
-            return false;
-        }
-        else return true;
+        return (height > 100 || mass > 30 || height < 220 || mass < 350);
+
     }
 
     double countBMI() {
-        if (!correctData()){
-            //throw IllegalArgumentException
-            return WRONG_ARGS;
-        }else{
+        if (!correctData()) {
+            throw new IllegalArgumentException();
+
+        } else {
             double result = mass / (height * height);
-            return result*10000;
+            bmi = result * 10000;
+            return bmi;
         }
 
     }
-
 
 
 }
